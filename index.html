@@ -74,6 +74,7 @@
       }
     ];
 
+
     function renderComments() {
       const commentsList = document.querySelector('.comments');
       let html = '';
@@ -103,10 +104,10 @@
     }
 
     function handleLikes() {
-      const buttonsLike = document.querySelectorAll('.like-button');
-      buttonsLike.forEach(button => {
-        button.addEventListener('click', function() {
-          const commentId = parseInt(this.dataset.id);
+      document.querySelector('.comments').addEventListener('click', function(event) {
+        if (event.target.classList.contains('like-button')) {
+          const button = event.target;
+          const commentId = parseInt(button.dataset.id);
           const comment = comments.find(c => c.id === commentId);
 
           if (comment) {
@@ -117,10 +118,10 @@
               comment.likes++;
               comment.isLiked = true;
             }
-
+            
             renderComments();
           }
-        });
+        };
       });
     }
 
