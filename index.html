@@ -9,7 +9,7 @@
   <body>
     <div class="container">
       <ul class="comments">
-        <li class="comment">
+        <!-- <li class="comment">
           <div class="comment-header">
             <div>Глеб Фокин</div>
             <div>12.02.22 12:18</div>
@@ -42,7 +42,7 @@
               <button class="like-button -active-like"></button>
             </div>
           </div>
-        </li>
+        </li> -->
       </ul>
       <div class="add-form">
         <input type="text" class="add-form-name" placeholder="Введите ваше имя"/>
@@ -74,6 +74,14 @@
       }
     ];
 
+    function escapeHtml(text) {
+      return text
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
 
     function renderComments() {
       const commentsList = document.querySelector('.comments');
@@ -82,13 +90,13 @@
         comments.forEach(comment => {
           const likeClass = comment.isLiked ? '-active-like' : '';
           html += `
-            <li class="comment">
-              <div class="comment-header">
-                <div>${comment.name}</div>
+            <li class="comment" data-id="${comment.id}">
+             <div class="comment-header">
+                <div>${escapeHtml(comment.name)}</div>
                 <div>${comment.date}</div>
               </div>
               <div class="comment-body">
-                <div class="comment-text">${comment.text}</div>
+                <div class="comment-text">${escapeHtml(comment.text)}</div>
               </div>
               <div class="comment-footer">
                 <div class="likes">
@@ -96,18 +104,17 @@
                   <button class="like-button ${likeClass}" data-id="${comment.id}"></button>
                 </div>
               </div>
-            </li>
-          `;
+            </li>`;
         });
 
       commentsList.innerHTML = html;
     }
 
     function handleLikes() {
-      document.querySelector('.comments').addEventListener('click', function(event) {
+      document.querySelector('.comments').addEventListener('click', (event) => {
         if (event.target.classList.contains('like-button')) {
           const button = event.target;
-          const commentId = parseInt(button.dataset.id);
+          const commentId = parseInt(button.dataset.id, 10);
           const comment = comments.find(c => c.id === commentId);
 
           if (comment) {
@@ -125,15 +132,35 @@
       });
     }
 
-    const commentsList = document.querySelector('.comments');
-    const nameInput = document.querySelector('.add-form-name');
-    const textInput = document.querySelector('.add-form-text'); 
-    const addButton = document.querySelector('.add-form-button');
+    function setupReplyHandler() {
+      const commentsList = document.querySelector('.comments');
 
-    addButton.addEventListener('click', function(event) {
-      event.preventDefault();
+      commentsList.addEventListener('click', (event) => {
+        if (event.target.classList.contains('like-button')) {
+          return;
+        }
+
+        const commentEl = event.target.closest('.comment');
+        if (!commentEl) return;
+
+        const commentId = parseInt(commentEl.dataset.id);
+        if (!commentId || isNaN(commentId)) return;
+
+        const comment = comments.find(c => c.id === commentId);
+        if (comment) {
+          document.querySelector('.add-form-name').value = comment.name;
+          document.querySelector('.add-form-text').value = `> ${comment.text}\n\n`;
+        }
+      });
+    }
+
+    document.querySelector('.add-form-button').addEventListener('click', () => {
+      const nameInput = document.querySelector('.add-form-name');
+      const textInput = document.querySelector('.add-form-text');
+
       const name = nameInput.value.trim();
       const text = textInput.value.trim();
+      
       if (!name || !text) {
         alert('Заполнены не все поля');
         return;
@@ -150,9 +177,9 @@
     
       const newComment = {
         id: comments.length + 1, 
-        name: name,
+        name: escapeHtml(name),
         date: formattedDate,
-        text: text,
+        text: escapeHtml(text),
         likes: 0,
         isLiked: false
       };
@@ -165,8 +192,11 @@
       textInput.value = '';
     });
     
+    
+    
       renderComments();
       handleLikes();
+      setupReplyHandler();
 
     console.log("It works!");
   </script>
