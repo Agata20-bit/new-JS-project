@@ -38,10 +38,12 @@ body {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    overflow: hidden;
   }
 
   .comment {
     padding: 48px;
+    overflow: hidden;
   }
 
   .comment-header {
@@ -58,10 +60,14 @@ body {
   .comment-body {
     margin-top: 32px;
     margin-bottom: 32px;
+    overflow: auto;
   }
 
   .comment-text {
     font-size: 32px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
   }
 
   .likes {
@@ -115,6 +121,8 @@ body {
     margin-top: 12px;
     padding: 22px;
     resize: none;
+    overflow-y: auto; 
+    max-height: 200px;
   }
 
   .add-form-row {

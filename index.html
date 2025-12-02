@@ -9,40 +9,6 @@
   <body>
     <div class="container">
       <ul class="comments">
-        <li class="comment">
-          <div class="comment-header">
-            <div>Глеб Фокин</div>
-            <div>12.02.22 12:18</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              Это будет первый комментарий на этой странице
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">3</span>
-              <button class="like-button"></button>
-            </div>
-          </div>
-        </li>
-        <li class="comment">
-          <div class="comment-header">
-            <div>Варвара Н.</div>
-            <div>13.02.22 19:22</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              Мне нравится как оформлена эта страница! ❤
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">75</span>
-              <button class="like-button -active-like"></button>
-            </div>
-          </div>
-        </li>
       </ul>
       <div class="add-form">
         <input type="text" class="add-form-name" placeholder="Введите ваше имя"/>
@@ -52,122 +18,10 @@
         </div>
       </div>
     </div>
-  </body>
-
-  <script>"use strict";
-
-    const comments = [{
-        id: 1,
-        name: 'Глеб Фокин',
-        date: '12.02.22 12:18',
-        text: 'Это будет первый комментарий на этой странице',
-        likes: 3,
-        isLiked: false
-      },
-      {
-        id: 2,
-        name: 'Варвара Н.',
-        date: '13.02.22 19:22',
-        text: 'Мне нравится как оформлена эта страница! ❤',
-        likes: 75,
-        isLiked: true
-      }
-    ];
-
-
-    function renderComments() {
-      const commentsList = document.querySelector('.comments');
-      let html = '';
-
-        comments.forEach(comment => {
-          const likeClass = comment.isLiked ? '-active-like' : '';
-          html += `
-            <li class="comment">
-              <div class="comment-header">
-                <div>${comment.name}</div>
-                <div>${comment.date}</div>
-              </div>
-              <div class="comment-body">
-                <div class="comment-text">${comment.text}</div>
-              </div>
-              <div class="comment-footer">
-                <div class="likes">
-                  <span class="likes-counter">${comment.likes}</span>
-                  <button class="like-button ${likeClass}" data-id="${comment.id}"></button>
-                </div>
-              </div>
-            </li>
-          `;
-        });
-
-      commentsList.innerHTML = html;
-    }
-
-    function handleLikes() {
-      document.querySelector('.comments').addEventListener('click', function(event) {
-        if (event.target.classList.contains('like-button')) {
-          const button = event.target;
-          const commentId = parseInt(button.dataset.id);
-          const comment = comments.find(c => c.id === commentId);
-
-          if (comment) {
-            if (comment.isLiked) {
-              comment.likes--;
-              comment.isLiked = false;
-            } else {
-              comment.likes++;
-              comment.isLiked = true;
-            }
-            
-            renderComments();
-          }
-        };
-      });
-    }
-
-    const commentsList = document.querySelector('.comments');
-    const nameInput = document.querySelector('.add-form-name');
-    const textInput = document.querySelector('.add-form-text'); 
-    const addButton = document.querySelector('.add-form-button');
-
-    addButton.addEventListener('click', function(event) {
-      event.preventDefault();
-      const name = nameInput.value.trim();
-      const text = textInput.value.trim();
-      if (!name || !text) {
-        alert('Заполнены не все поля');
-        return;
-      }
-    
-      const date = new Date();
-      const formattedDate = date.toLocaleDateString('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    
-      const newComment = {
-        id: comments.length + 1, 
-        name: name,
-        date: formattedDate,
-        text: text,
-        likes: 0,
-        isLiked: false
-      };
-    
-      comments.push(newComment);
-      
-      renderComments();
-    
-      nameInput.value = '';
-      textInput.value = '';
-    });
-    
-      renderComments();
-      handleLikes();
-
-    console.log("It works!");
-  </script>
+  
+    <script type="module" src="./strict.js">
+    </script>
+  </body> 
 </html>
+
+  
