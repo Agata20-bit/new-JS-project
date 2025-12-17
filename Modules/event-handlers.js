@@ -1,4 +1,4 @@
-import { renderComments } from '../render-comments.js';
+import { renderComments } from './render-comments.js';
 import { comments } from './comments.js';
 
 export function handleLikes() {
