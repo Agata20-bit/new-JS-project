@@ -7,3 +7,15 @@ export const fetchComments = () => {
             return data;
         });
 };
+
+
+export const sendComments = ({name , text}) => {
+    return fetch(host + '/comments', { 
+   method: 'POST',
+   body: JSON.stringify({ name , text })
+})
+        .then((res) => res.json())
+        .then((data) => {
+            return data;
+        });
+};

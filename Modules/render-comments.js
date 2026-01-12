@@ -1,5 +1,6 @@
 import { escapeHtml } from './escape-html.js';
 
+
 export function renderComments(comments) {
   const commentsList = document.querySelector('.comments');
   let html = '';
@@ -9,7 +10,7 @@ export function renderComments(comments) {
     html += `
       <li class="comment" data-id="${comment.id}">
         <div class="comment-header">
-          <div>${escapeHtml(comment.name)}</div>
+          <div>${escapeHtml(comment.author.name)}</div>
           <div>${comment.date}</div>
         </div>
         <div class="comment-body">
