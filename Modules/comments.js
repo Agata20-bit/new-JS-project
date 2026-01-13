@@ -1,4 +1,4 @@
-export const comments = [
+export let comments = [
     {
     id: 1,
     name: 'Глеб Фокин',
@@ -16,3 +16,4 @@ export const comments = [
     isLiked: true
     }
 ];
+
