@@ -5,7 +5,7 @@ import { renderComments, updateCommentUI } from './render-comments.js';
 export function handleLikes() {
     document
         .querySelector('.comments')
-        ?.addEventListener('click', async (event) => {
+        .addEventListener('click', async (event) => {
             if (!event.target.classList.contains('like-button')) return;
 
             const button = event.target;
@@ -19,12 +19,12 @@ export function handleLikes() {
                 try {
                     await sendComments({
                         id: comment.id,
-                        name: comment.name,
-                        text: comment.text,
+                        name: comment.name ?? 'Неизвестный автор', // значение по умолчанию
+                        text: comment.text ?? '', // значение по умолчанию
                         likes: comment.likes,
                         isLiked: comment.isLiked,
                     });
-                    updateCommentUI(commentId); // Точечное обновление
+                    updateCommentUI(commentId);
                 } catch (error) {
                     console.error('Ошибка при обновлении лайка:', error);
                     comment.isLiked = !comment.isLiked;
@@ -70,14 +70,7 @@ export function setupAddCommentHandler() {
             return;
         }
 
-        const date = new Intl.DateTimeFormat('ru-RU', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-        }).format(new Date());
+        const date = new Date().toISOString().replace('T', ' ').slice(0, 19); // Например: 2023-12-05 12:34:56
 
         const newComment = {
             name: name,

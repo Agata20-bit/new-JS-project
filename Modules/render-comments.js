@@ -1,31 +1,35 @@
 import { escapeHtml } from './escape-html.js';
 
 export function renderComments(comments) {
-    const commentsList = document.querySelector('.comments');
-    if (!commentsList) return;
+  const commentsList = document.querySelector('.comments');
+  if (!commentsList) return;
 
-    let html = '';
-    comments.forEach((comment) => {
-        const likeClass = comment.isLiked ? '-active-like' : '';
-        html += `
+  let html = '';
+  comments.forEach((comment) => {
+    // Проверяем и задаём значения по умолчанию
+    const authorName = comment.name ?? 'Неизвестный автор';
+    const commentText = comment.text ?? '';
+
+    const likeClass = comment.isLiked ? '-active-like' : '';
+    html += `
       <li class="comment" data-id="${comment.id}">
         <div class="comment-header">
-          <div>${escapeHtml(comment.name)}</div>
-          <div>${comment.date}</div>
+          <div>${escapeHtml(String(authorName))}</div> <!-- Преобразуем в строку -->
+          <div>${String(comment.date)}</div> <!-- Преобразуем в строку -->
         </div>
         <div class="comment-body">
-          <div class="comment-text">${escapeHtml(comment.text)}</div>
+          <div class="comment-text">${escapeHtml(String(commentText))}</div>
         </div>
         <div class="comment-footer">
           <div class="likes">
-            <span class="likes-counter">${comment.likes}</span>
+            <span class="likes-counter">${Number(comment.likes)}</span> <!-- Преобразуем в число -->
             <button class="like-button ${likeClass}" data-id="${comment.id}"></button>
           </div>
         </div>
       </li>`;
-    });
+  });
 
-    commentsList.innerHTML = html;
+  commentsList.innerHTML = html;
 }
 
 export function updateCommentUI(commentId) {

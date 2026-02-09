@@ -5,11 +5,16 @@ export const fetchComments = () => {
 };
 
 export const sendComments = (comment) => {
-    return fetch(host + '/comments', {
-        method: 'POST',
-        body: JSON.stringify(comment),
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    }).then((res) => res.json());
+  // Проверяем обязательные поля
+  if (!comment.id || !comment.name || !comment.text) {
+    return Promise.reject(new Error('Недостаточно данных для отправки'));
+  }
+
+  return fetch(host + '/comments', {
+    method: 'POST',
+    body: JSON.stringify(comment),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }).then((res) => res.json());
 };

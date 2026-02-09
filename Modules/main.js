@@ -7,26 +7,28 @@ import {
 } from './event-handlers.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        // 1. Загружаем комментарии с сервера
-        const response = await fetchComments();
+  try {
+    const response = await fetchComments();
+    const commentsData = response.comments;
 
-        // 2. Обновляем локальный массив comments
-        comments = response.comments;
+    // Валидируем каждый комментарий — добавляем недостающие поля
+    const validatedComments = commentsData.map(comment => ({
+      id: comment.id,
+      name: comment.name ?? 'Неизвестный автор', // если name отсутствует
+      text: comment.text ?? '', // если text отсутствует
+      date: comment.date,
+      likes: comment.likes ?? 0,
+      isLiked: comment.isLiked ?? false
+    }));
 
-        // 3. Отрисовываем комментарии
-        renderComments(comments);
+    comments = validatedComments;
+    renderComments(comments);
 
-        // 4. Подключаем обработчики событий
-        handleLikes();
-        setupReplyHandler();
-        setupAddCommentHandler();
-
-        console.log('Приложение запущено!');
-    } catch (error) {
-        console.error('Ошибка при загрузке комментариев:', error);
-        alert(
-            'Не удалось загрузить комментарии. Проверьте подключение к сети.',
-        );
-    }
+    handleLikes();
+    setupReplyHandler();
+    setupAddCommentHandler();
+  } catch (error) {
+    console.error('Ошибка при загрузке комментариев:', error);
+    alert('Не удалось загрузить комментарии. Проверьте подключение к сети.');
+  }
 });
