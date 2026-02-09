@@ -1,26 +1,37 @@
-import { renderComments } from './render-comments.js';
 import { comments } from './comments.js';
 import { fetchComments, sendComments } from './api.js';
+import { renderComments, updateCommentUI } from './render-comments.js';
 
 export function handleLikes() {
-    document.querySelector('.comments').addEventListener('click', (event) => {
-        if (event.target.classList.contains('like-button')) {
+    document
+        .querySelector('.comments')
+        ?.addEventListener('click', async (event) => {
+            if (!event.target.classList.contains('like-button')) return;
+
             const button = event.target;
             const commentId = parseInt(button.dataset.id, 10);
             const comment = comments.find((c) => c.id === commentId);
 
             if (comment) {
-                if (comment.isLiked) {
-                    comment.likes--;
-                    comment.isLiked = false;
-                } else {
-                    comment.likes++;
-                    comment.isLiked = true;
+                comment.isLiked = !comment.isLiked;
+                comment.likes += comment.isLiked ? 1 : -1;
+
+                try {
+                    await sendComments({
+                        id: comment.id,
+                        name: comment.name,
+                        text: comment.text,
+                        likes: comment.likes,
+                        isLiked: comment.isLiked,
+                    });
+                    updateCommentUI(commentId); // Точечное обновление
+                } catch (error) {
+                    console.error('Ошибка при обновлении лайка:', error);
+                    comment.isLiked = !comment.isLiked;
+                    comment.likes += comment.isLiked ? -1 : 1;
                 }
-                renderComments(comments);
             }
-        }
-    });
+        });
 }
 
 export function setupReplyHandler() {
@@ -28,7 +39,7 @@ export function setupReplyHandler() {
     const nameInput = document.querySelector('.add-form-name');
     const textInput = document.querySelector('.add-form-text');
 
-    commentsList.addEventListener('click', (event) => {
+    commentsList?.addEventListener('click', (event) => {
         if (event.target.classList.contains('like-button')) return;
 
         const commentEl = event.target.closest('.comment');
@@ -50,7 +61,7 @@ export function setupAddCommentHandler() {
     const nameInput = document.querySelector('.add-form-name');
     const textInput = document.querySelector('.add-form-text');
 
-    addButton.addEventListener('click', () => {
+    addButton?.addEventListener('click', () => {
         const name = nameInput.value.trim();
         const text = textInput.value.trim();
 
@@ -59,28 +70,33 @@ export function setupAddCommentHandler() {
             return;
         }
 
-        const date = new Date().toLocaleDateString('ru-RU', {
+        const date = new Intl.DateTimeFormat('ru-RU', {
             day: '2-digit',
             month: '2-digit',
-            year: '2-digit',
+            year: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
-        });
+            second: '2-digit',
+        }).format(new Date());
 
         const newComment = {
             name: name,
             text: text,
+            date: date,
+            likes: 0,
+            isLiked: false,
         };
 
-        // comments(newComment);
         sendComments(newComment)
-            .then(() => {
-                return fetchComments();
-            })
+            .then(() => fetchComments())
             .then((data) => {
-                renderComments(data.comments);
+                comments = data.comments; // Обновляем локальный массив
+                renderComments(comments);
                 nameInput.value = '';
                 textInput.value = '';
-            });
+            })
+            .catch((error) =>
+                console.error('Ошибка отправки комментария:', error),
+            );
     });
 }

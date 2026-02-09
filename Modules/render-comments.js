@@ -1,16 +1,16 @@
 import { escapeHtml } from './escape-html.js';
 
-
 export function renderComments(comments) {
-  const commentsList = document.querySelector('.comments');
-  let html = '';
+    const commentsList = document.querySelector('.comments');
+    if (!commentsList) return;
 
-  comments.forEach((comment) => {
-    const likeClass = comment.isLiked ? '-active-like' : '';
-    html += `
+    let html = '';
+    comments.forEach((comment) => {
+        const likeClass = comment.isLiked ? '-active-like' : '';
+        html += `
       <li class="comment" data-id="${comment.id}">
         <div class="comment-header">
-          <div>${escapeHtml(comment.author.name)}</div>
+          <div>${escapeHtml(comment.name)}</div>
           <div>${comment.date}</div>
         </div>
         <div class="comment-body">
@@ -23,7 +23,21 @@ export function renderComments(comments) {
           </div>
         </div>
       </li>`;
-  });
+    });
 
-  commentsList.innerHTML = html;
+    commentsList.innerHTML = html;
+}
+
+export function updateCommentUI(commentId) {
+    const commentEl = document.querySelector(`[data-id="${commentId}"]`);
+    if (!commentEl) return;
+
+    const likesCounter = commentEl.querySelector('.likes-counter');
+    const likeButton = commentEl.querySelector('.like-button');
+
+    const comment = comments.find((c) => c.id === commentId);
+    if (!comment) return;
+
+    likesCounter.textContent = comment.likes;
+    likeButton.classList.toggle('-active-like', comment.isLiked);
 }
