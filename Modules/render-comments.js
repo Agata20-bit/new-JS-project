@@ -1,17 +1,17 @@
 import { escapeHtml } from './escape-html.js';
 
 export function renderComments(comments) {
-  const commentsList = document.querySelector('.comments');
-  if (!commentsList) return;
+    const commentsList = document.querySelector('.comments');
+    if (!commentsList) return;
 
-  let html = '';
-  comments.forEach((comment) => {
-    // Проверяем и задаём значения по умолчанию
-    const authorName = comment.name ?? 'Неизвестный автор';
-    const commentText = comment.text ?? '';
+    let html = '';
+    comments.forEach((comment) => {
+        // Проверяем и задаём значения по умолчанию
+        const authorName = comment.name ?? 'Неизвестный автор';
+        const commentText = comment.text ?? '';
 
-    const likeClass = comment.isLiked ? '-active-like' : '';
-    html += `
+        const likeClass = comment.isLiked ? '-active-like' : '';
+        html += `
       <li class="comment" data-id="${comment.id}">
         <div class="comment-header">
           <div>${escapeHtml(String(authorName))}</div> <!-- Преобразуем в строку -->
@@ -27,9 +27,9 @@ export function renderComments(comments) {
           </div>
         </div>
       </li>`;
-  });
+    });
 
-  commentsList.innerHTML = html;
+    commentsList.innerHTML = html;
 }
 
 export function updateCommentUI(commentId) {
