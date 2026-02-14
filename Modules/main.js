@@ -8,17 +8,19 @@ import {
 
 document.addEventListener('DOMContentLoaded', async () => {
   try {
-    const response = await fetchComments();
-    const commentsData = response.comments;
+    const loadingMessage = document.createElement('div');
+    loadingMessage.className = 'loading-message';
+    loadingMessage.textContent = 'Загружаем комментарии...';
+    document.body.appendChild(loadingMessage);
 
-    // Валидируем каждый комментарий — добавляем недостающие поля
-    const validatedComments = commentsData.map(comment => ({
+    const commentsData = await fetchComments();
+    const validatedComments = commentsData.comments.map(comment => ({
       id: comment.id,
-      name: comment.name ?? 'Неизвестный автор', // если name отсутствует
-      text: comment.text ?? '', // если text отсутствует
+      name: comment.name ?? 'Неизвестный автор',
+      text: comment.text ?? '',
       date: comment.date,
       likes: comment.likes ?? 0,
-      isLiked: comment.isLiked ?? false
+      isLiked: comment.isLiked ?? false,
     }));
 
     comments = validatedComments;
@@ -27,6 +29,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     handleLikes();
     setupReplyHandler();
     setupAddCommentHandler();
+
+    // Убираем сообщение после загрузки
+    loadingMessage.remove();
   } catch (error) {
     console.error('Ошибка при загрузке комментариев:', error);
     alert('Не удалось загрузить комментарии. Проверьте подключение к сети.');
