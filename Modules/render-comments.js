@@ -42,6 +42,6 @@ export function updateCommentUI(commentId) {
     const comment = comments.find((c) => c.id === commentId);
     if (!comment) return;
 
-    likesCounter.textContent = comment.likes;
-    likeButton.classList.toggle('-active-like', comment.isLiked);
+  likesCounter.textContent = comment.likes;
+  likeButton.classList.toggle('-active-like', comment.isLiked);
 }
