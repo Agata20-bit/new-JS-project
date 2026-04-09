@@ -1,5 +1,4 @@
 import { comments } from './comments.js';
-import { fetchComments, sendComments } from './api.js';
 import { renderComments, updateCommentUI } from './render-comments.js';
 
 export function handleLikes() {
@@ -13,25 +12,27 @@ export function handleLikes() {
             const comment = comments.find((c) => c.id === commentId);
 
             if (comment) {
-                comment.isLiked = !comment.isLiked;
-                comment.likes += comment.isLiked ? 1 : -1;
+                // Добавляем анимацию
+                button.classList.add('-loading-like');
+                comment.isLikeLoading = true;
 
                 try {
-                    await sendComments({
-                        id: comment.id,
-                        name: comment.name ?? 'Неизвестный автор', // значение по умолчанию
-                        text: comment.text ?? '', // значение по умолчанию
-                        likes: comment.likes,
-                        isLiked: comment.isLiked,
-                    });
-                    updateCommentUI(commentId);
-                } catch (error) {
-                    console.error('Ошибка при обновлении лайка:', error);
+                    await delay(2000); // Симуляция API-запроса
                     comment.isLiked = !comment.isLiked;
-                    comment.likes += comment.isLiked ? -1 : 1;
-                }
-            }
-        });
+            comment.likes += comment.isLiked ? 1 : -1;
+            updateCommentUI(commentId);
+        } catch (error) {
+            console.error('Ошибка при обновлении лайка:', error);
+            // Откат изменений при ошибке
+            comment.isLiked = !comment.isLiked;
+            comment.likes += comment.isLiked ? -1 : 1;
+        } finally {
+            // Убираем анимацию
+            button.classList.remove('-loading-like');
+            comment.isLikeLoading = false;
+        }
+    }
+});
 }
 
 export function setupReplyHandler() {
@@ -50,7 +51,7 @@ export function setupReplyHandler() {
 
         const comment = comments.find((c) => c.id === commentId);
         if (comment) {
-            nameInput.value = comment.name;
+            nameInput.value = comment.author.name;
             textInput.value = `> ${comment.text}\n\n`;
         }
     });
@@ -60,8 +61,9 @@ export function setupAddCommentHandler() {
     const addButton = document.querySelector('.add-form-button');
     const nameInput = document.querySelector('.add-form-name');
     const textInput = document.querySelector('.add-form-text');
+    const addForm = document.querySelector('.add-form');
 
-    addButton?.addEventListener('click', () => {
+    addButton?.addEventListener('click', async () => {
         const name = nameInput.value.trim();
         const text = textInput.value.trim();
 
@@ -70,9 +72,17 @@ export function setupAddCommentHandler() {
             return;
         }
 
-        const date = new Date().toISOString().replace('T', ' ').slice(0, 19); // Например: 2023-12-05 12:34:56
+        // Скрываем форму и показываем сообщение
+        addForm.style.display = 'none';
+        const loadingMessage = document.createElement('div');
+        loadingMessage.className = 'loading-message';
+        loadingMessage.textContent = 'Комментарий добавляется';
+        addForm.parentNode.appendChild(loadingMessage);
+
+        const date = new Date().toISOString().replace('T', ' ').slice(0, 19);
 
         const newComment = {
+            id: Date.now(),
             name: name,
             text: text,
             date: date,
@@ -80,16 +90,24 @@ export function setupAddCommentHandler() {
             isLiked: false,
         };
 
-        sendComments(newComment)
-            .then(() => fetchComments())
-            .then((data) => {
-                comments = data.comments; // Обновляем локальный массив
-                renderComments(comments);
-                nameInput.value = '';
-                textInput.value = '';
-            })
-            .catch((error) =>
-                console.error('Ошибка отправки комментария:', error),
-            );
+        try {
+            await sendComments(newComment);
+            await loadComments(); // Перезагружаем комментарии
+        } catch (error) {
+            console.error('Ошибка отправки комментария:', error);
+            alert('Не удалось отправить комментарий. Попробуйте позже.');
+        } finally {
+            // Возвращаем форму и убираем сообщение
+            addForm.style.display = 'block';
+            loadingMessage.remove();
+        }
+    });
+}
+
+function delay(interval = 300) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve();
+        }, interval);
     });
 }
