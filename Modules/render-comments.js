@@ -6,7 +6,7 @@ export function renderComments(comments) {
 
     let html = '';
     comments.forEach((comment) => {
-        const authorName = comment.name ?? 'Неизвестный автор';
+        const authorName = comment.author.name ?? 'Неизвестный автор';
         const commentText = comment.text ?? '';
 
         const likeClass = comment.isLiked ? '-active-like' : '';

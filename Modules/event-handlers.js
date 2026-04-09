@@ -51,7 +51,7 @@ export function setupReplyHandler() {
 
         const comment = comments.find((c) => c.id === commentId);
         if (comment) {
-            nameInput.value = comment.name;
+            nameInput.value = comment.author.name;
             textInput.value = `> ${comment.text}\n\n`;
         }
     });
