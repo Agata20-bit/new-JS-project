@@ -7,13 +7,22 @@ import {
 } from './Modules/event-handlers.js';
 import { fetchComments } from './Modules/api.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        const loadingMessage = document.createElement('div');
-        loadingMessage.className = 'loading-message';
-        loadingMessage.textContent = 'Загружаем комментарии...';
-        document.body.appendChild(loadingMessage);
+function showLoadingMessage(text) {
+    const loadingMessage = document.createElement('div');
+    loadingMessage.className = 'loading-message';
+    loadingMessage.textContent = text;
+    document.body.appendChild(loadingMessage);
+    return loadingMessage;
+}
 
+function hideLoadingMessage(loadingMessage) {
+    if (loadingMessage) loadingMessage.remove();
+}
+
+async function loadComments() {
+    const loadingMessage = showLoadingMessage('Загружаем комментарии...');
+
+    try {
         const commentsData = await fetchComments();
         const validatedComments = commentsData.comments.map((comment) => ({
             id: comment.id,
@@ -24,18 +33,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             isLiked: comment.isLiked ?? false,
         }));
 
-        comments = validatedComments; // Теперь работает, т.к. comments — let
+        comments.length = 0;
+        comments.push(...validatedComments);
         renderComments(comments);
-
         handleLikes();
         setupReplyHandler();
-        setupAddCommentHandler();
-
-        loadingMessage.remove();
     } catch (error) {
         console.error('Ошибка при загрузке комментариев:', error);
-        alert(
-            'Не удалось загрузить комментарии. Проверьте подключение к сети.',
-        );
+        alert('Не удалось загрузить комментарии. Проверьте подключение к сети.');
+    } finally {
+        hideLoadingMessage(loadingMessage);
     }
-});
+}
+
+document.addEventListener('DOMContentLoaded', loadComments);

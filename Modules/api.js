@@ -1,11 +1,17 @@
 const host = 'https://wedev-api.sky.pro/api/v1/Agata20-bit';
 
 export const fetchComments = () => {
-    return fetch(host + '/comments').then((res) => res.json());
+    return fetch(host + '/comments')
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        });
 };
 
 export const sendComments = (comment) => {
-    if (!comment.id || !comment.name || !comment.text) {
+    if (!comment.name || !comment.text) {
         return Promise.reject(new Error('Недостаточно данных для отправки'));
     }
     return fetch(host + '/comments', {
